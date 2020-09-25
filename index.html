@@ -1,61 +1,49 @@
 <html>
   <head>
     <title>RISM Sigla Catalogue</title>
-    <link rel="stylesheet" type="text/css" href="http://www.rism.info/typo3conf/ext/user_apachesolr/mystyle.css"> 
+    <link rel="stylesheet" type="text/css" href="./sigla.css"  />
   </head>
   <body>
-    <form accept-charset="utf-8" method="get" class="inputform">
-      <select id="ad" name="advanced">
-        <option value="">All fields</option>
-        <option value="name:">Name</option>
-        <option value="sigla:">Library Sigla</option>
-        <option value="city:">City</option>
-        <option value="country:">Country</option>             
-      </select>
-      <input id="q" name="q" class="searchBox ui-autocomplete-input" type="text" value="paris" autocomplete="off" role="textbox" aria-autocomplete="list" aria-haspopup="true">
-      <input type="submit" value="Search">
-    </form>
+    <div class="siglaCatalog">
+      <div class="siglaQuery">
+        <div class="siglaQuerySelect">
+          <select id="siglaQuerySelect" name="advanced">
+            <option value="">All fields</option>
+            <option value="name:">Name</option>
+            <option value="sigla:">Library Sigla</option>
+            <option value="city:">City</option>
+            <option value="country:">Country</option>             
+          </select>
+        </div>
 
-    <div class="res">RISM: Hits 1-20      of 82 for <b>paris</b> (0.002 Sekunden).</div>
+        <div class="siglaQueryInput">
+          <input id="siglaQueryInput">
+        </div>
+        <div class="siglaQuerySubmit">
+          <input id="siglaQuerySubmit" type="submit" value="Search">
+        </div>
+      </div>
 
-    <div class="restable">
-      <a class="box" href="http://www.rism.info/typo3conf/ext/user_apachesolr/result.php?q=id:30001483" onclick="window.open(this.href, 'Result', 'height=680,width=520,scrollbars=yes'); return false;">
-        <table class="resulttable">
 
-          <tbody><tr><td><b><span class="tdsmall">1.</span></b></td><td class="tdlarge"><b>Collection Hanson, Paris</b></td><td></td></tr><tr><td></td><td><span style="color:#005091;">(F-Phanson)</span></td></tr>
-          </tbody>
-        </table>
-      </a> 
+      <div class="siglaResultSize">RISM: Hits 1-20 of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span> (0.002 Sekunden).</div>
+
+      <div class="siglaResultTables">
+
+        <a class="box" href="http://www.rism.info/typo3conf/ext/user_apachesolr/result.php?q=id:30001483" onclick="window.open(this.href, 'Result', 'height=680,width=520,scrollbars=yes'); return false;">
+          <table class="siglaResultTable">
+
+            <tbody><tr><td><b><span class="tdsmall">1.</span></b></td><td class="tdlarge"><b>Collection Hanson, Paris</b></td><td></td></tr><tr><td></td><td><span style="color:#005091;">(F-Phanson)</span></td></tr>
+            </tbody>
+          </table>
+        </a> 
+      </div>
     </div>
 
-
-    <script type="text/javascript">
-      //<![CDATA[
-$(document).ready(function() {
-  $("input#q").autocomplete({
-    source: function(request, response) {
-      $.ajax({
-        url: "get_list.php",
-        dataType: "json",
-        data: {
-          term : request.term,
-          advanced : $("#ad :selected").text()
-
-        },
-        success: function(data) {
-          response(data);
-
-        }
-
-      });
-
-    }    
-
-  });
-
-});
-                                                                                                                                                                                                                                                                                                                                                                                         ]]
-    </script>
+    <script type="text/javascript" src="./query.js"></script>
 
 
-    <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content ui-corner-all" role="listbox" aria-activedescendant="ui-active-menuitem" style="z-index: 1; top: 0px; left: 0px; display: none;"></ul></body></html>
+    <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content ui-corner-all" role="listbox" aria-activedescendant="ui-active-menuitem" style="z-index: 1; top: 0px; left: 0px; display: none;">
+    </ul>
+
+  </body>
+</html>
