@@ -21,6 +21,7 @@
 }
 
 .siglaResultSize {
+  display: none;
   margin-top: 20px;
 }
 
@@ -29,6 +30,23 @@
 }
 
 .queryTerm {
-
   font-weight: bold;
+}
+
+.resultItem {
+  position: relative;
+  display: block;
+  color: black;
+  background-color: #efefef;
+  height: 32px;
+  padding: 4px;
+  font-size: 14px;
+  text-decoration: none;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.itemSigla {
+  color: #005091;
+  font-weight: normal;
 }
