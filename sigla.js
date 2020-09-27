@@ -1,3 +1,11 @@
+/**
+* Summary RISM sigla catalog.
+* Description This JS is building html nodes from a RISM-SRU request.to sigla.
+* @author: Stephan Hirsch
+* @version: 0.1
+*
+*/
+
 const nsMarc = "http://www.loc.gov/MARC21/slim";
 const nsZing = "http://www.loc.gov/zing/srw/";
 var results = document.querySelector('.siglaResultTables');
@@ -6,7 +14,8 @@ var records = [];
 document.querySelector("#siglaQuerySubmit").addEventListener("click", (e) => {
   var queryTerm = document.querySelector("#siglaQueryInput").value;
   var xhr = new XMLHttpRequest();
-  
+ 
+  // Ajax reuest to SRU  
   xhr.onload = function () {
     records = [];
     if (xhr.status >= 200 && xhr.status < 300) {
@@ -18,46 +27,25 @@ document.querySelector("#siglaQuerySubmit").addEventListener("click", (e) => {
       document.querySelector(".siglaResultSize").style.display = 'block';
       var marcRecords = xmlDoc.getElementsByTagNameNS(nsMarc, "record");
       for (let i = 0; i < marcRecords.length; i++) {
-        var record = {};
-        var marcRecord = marcRecords[i];
-        var fields = marcRecord.children;
-        for (let i = 0; i < fields.length; i++) {
-          field = fields[i];
-          if (field.getAttribute("tag") == "001") {
-            record.id = field.innerHTML;
-          }
-          if (field.getAttribute("tag") == "110") {
-            subfields = field.children;
-            for (let i = 0; i < subfields.length; i++) {
-              subfield = subfields[i];
-              if (subfield.getAttribute("code") == "a") {
-                record._110a = subfield.innerHTML;
-              }
-              if (subfield.getAttribute("code") == "g") {
-                record._110g = subfield.innerHTML;
-              }
-            }
-          }
-        }
+        var record = buildRecord(marcRecords[i]);
         records.push(record);
       }
-      //console.log(records);
-      putsMarc(records);
+      createElements(records);
     }
     else {
       console.log('The request failed!');
     }
-    //console.log('This always runs...');
+    //outer scope
   };
 
-  xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}&maximumRecords=20`);
+  xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}%20AND%20librarySiglum=*-*&maximumRecords=20`);
   xhr.send();
 
-  var putsMarc = function(collection){
+  //Function to add various div-tags to document.parent .siglaResultTables
+  var createElements = function(collection){
     var parent = document.querySelector('.siglaResultTables');
     while (parent.firstChild) {
       parent.firstChild.remove()
-
     }
     for (let i = 0; i < collection.length; i++) {
       record = collection[i];
@@ -70,8 +58,35 @@ document.querySelector("#siglaQuerySubmit").addEventListener("click", (e) => {
       div.appendChild(sigla);
       parent.appendChild(div);
     }
-
   }
+
+  //Function to build a record object from marcxml-record
+  var buildRecord = function(xml) {
+    var record = {};
+    var fields = xml.children;
+    for (let i = 0; i < fields.length; i++) {
+      field = fields[i];
+      if (field.getAttribute("tag") == "001") {
+        record.id = field.innerHTML;
+      }
+      if (field.getAttribute("tag") == "110") {
+        subfields = field.children;
+        for (let i = 0; i < subfields.length; i++) {
+          subfield = subfields[i];
+          if (subfield.getAttribute("code") == "a") {
+            record._110a = subfield.innerHTML;
+          }
+          if (subfield.getAttribute("code") == "g") {
+            record._110g = subfield.innerHTML;
+          }
+        }
+      }
+    }
+    return record;
+  }
+
+
+
 });
   
   
