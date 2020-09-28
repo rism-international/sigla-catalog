@@ -67,6 +67,7 @@ var search = function(){
         createElements(records);
       }
       else {
+        //FIXME show err at client
         console.log('The request failed!');
       }
       //outer
@@ -84,11 +85,19 @@ var createElements = function(collection){
   for (let i = 0; i < collection.length; i++) {
     record = collection[i];
     var div = 
-      `<div class="resultItem">${i+1}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
+      `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${i+1}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
         <div class="itemSigla">${record._110g}</div>
       </div>`
+    var details = `
+        <div id="details_${record.id}" class="itemDetails">
+          ${record._043c ? `<p><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></p>` : ""}
+          ${record._371a ? `<p><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></p>` : ""}
+          ${record._371u ? `<p><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></p>` : ""}
+      </div>`
     var element = new DOMParser().parseFromString(div, 'text/html');
+    var details_element = new DOMParser().parseFromString(details, 'text/html');
     parent.append(element.body.firstElementChild);
+    parent.append(details_element.body.firstElementChild);
    }
 }
 
@@ -101,6 +110,17 @@ var buildRecord = function(xml) {
     if (field.getAttribute("tag") == "001") {
       record.id = field.innerHTML;
     }
+
+    if (field.getAttribute("tag") == "043") {
+      subfields = field.children;
+      for (let i = 0; i < subfields.length; i++) {
+        subfield = subfields[i];
+        if (subfield.getAttribute("code") == "c") {
+          record._043c = subfield.innerHTML;
+        }
+      }
+    }
+ 
     if (field.getAttribute("tag") == "110") {
       subfields = field.children;
       for (let i = 0; i < subfields.length; i++) {
@@ -116,17 +136,40 @@ var buildRecord = function(xml) {
         }
       }
     }
+
+    if (field.getAttribute("tag") == "371") {
+      subfields = field.children;
+      for (let i = 0; i < subfields.length; i++) {
+        subfield = subfields[i];
+        if (subfield.getAttribute("code") == "a") {
+          record._371a = subfield.innerHTML;
+        }
+        if (subfield.getAttribute("code") == "u") {
+          record._371u = subfield.innerHTML;
+        }
+      }
+    }
   }
-  console.log(record);
   return record;
 }
 
+// Toggle display of details
+var showDetails = function(id){
+  var details = document.getElementById(`details_${id}`);
+  console.log(details.style.display);
+  if (details.style.display === "none" || details.style.display === "") {
+        details.style.display = "block";
+  } else {
+        details.style.display = "none";
+  }
+}
 
 window.onload = function() {
   document.querySelector("#siglaCatalog").innerHTML = markup;
   addListeners();
 }
 
+var countryCodes = {'XA-DE': 'Germany', 'XA-FR': 'France'}
 
 
 

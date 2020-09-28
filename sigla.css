@@ -49,4 +49,14 @@
 .itemSigla {
   color: #005091;
   font-weight: normal;
+  display: table-row;
+}
+
+.itemDetails {
+  font-weight: normal;
+  font-size: 0.8em;
+  display: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
 }
