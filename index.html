@@ -2,36 +2,12 @@
   <head>
     <title>RISM Sigla Catalogue</title>
     <link rel="stylesheet" type="text/css" href="./sigla.css"  />
+    <script type="text/javascript" src="./sigla.js"></script>
   </head>
   <body>
-    <div class="siglaCatalog">
-      <div class="siglaQuery">
-        <div class="siglaQuerySelect">
-          <select id="siglaQuerySelect" name="advanced">
-            <option value="">All fields</option>
-            <option value="name:">Name</option>
-            <option value="sigla:">Library Sigla</option>
-            <option value="city:">City</option>
-            <option value="country:">Country</option>             
-          </select>
-        </div>
-
-        <div class="siglaQueryInput">
-          <input id="siglaQueryInput">
-        </div>
-        <div class="siglaQuerySubmit">
-          <input id="siglaQuerySubmit" type="submit" value="Search">
-        </div>
-      </div>
-
-
-      <div class="siglaResultSize">RISM: Hits 1-20 of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>
-
-      <div class="siglaResultTables"></div>
-
+    <div id="siglaCatalog">
     </div>
 
-    <script type="text/javascript" src="./sigla.js"></script>
 
 
     <ul class="ui-autocomplete ui-menu ui-widget ui-widget-content ui-corner-all" role="listbox" aria-activedescendant="ui-active-menuitem" style="z-index: 1; top: 0px; left: 0px; display: none;">
