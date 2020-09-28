@@ -75,9 +75,6 @@ var search = function(){
     xhr.send();
 }
 
-
-
-
 //Function to add various div-tags to document.parent .siglaResultTables
 var createElements = function(collection){
   var parent = document.querySelector('.siglaResultTables');
@@ -86,15 +83,13 @@ var createElements = function(collection){
   }
   for (let i = 0; i < collection.length; i++) {
     record = collection[i];
-    var div = document.createElement('div');
-    div.classList.add('resultItem');
-    div.innerHTML = `${i + 1 }. ${record._110a}`;
-    var sigla = document.createElement('div');
-    sigla.innerHTML = `(${record._110g})`;
-    sigla.classList.add('itemSigla');
-    div.appendChild(sigla);
-    parent.appendChild(div);
-  }
+    var div = 
+      `<div class="resultItem">${i+1}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
+        <div class="itemSigla">${record._110g}</div>
+      </div>`
+    var element = new DOMParser().parseFromString(div, 'text/html');
+    parent.append(element.body.firstElementChild);
+   }
 }
 
 //Function to build a record object from marcxml-record
@@ -113,12 +108,16 @@ var buildRecord = function(xml) {
         if (subfield.getAttribute("code") == "a") {
           record._110a = subfield.innerHTML;
         }
+        if (subfield.getAttribute("code") == "c") {
+          record._110c = subfield.innerHTML;
+        }
         if (subfield.getAttribute("code") == "g") {
           record._110g = subfield.innerHTML;
         }
       }
     }
   }
+  console.log(record);
   return record;
 }
 
