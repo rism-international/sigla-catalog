@@ -110,6 +110,7 @@ var createElements = function(collection){
       </div>`
     var details = `
         <div id="details_${record.id}" class="itemDetails">
+          <b>Information:</b>
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
           ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
