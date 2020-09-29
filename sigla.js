@@ -10,6 +10,11 @@ const nsMarc = "http://www.loc.gov/MARC21/slim";
 const nsZing = "http://www.loc.gov/zing/srw/";
 var results = document.querySelector('.siglaResultTables');
 var records = [];
+var startRecord = 1;
+var query = {term: '*-*', offset: 1};
+var sruhost = "";
+var limit = 10;
+
 //Basic html template
 var markup = `
       <div class="siglaQuery">
@@ -29,8 +34,9 @@ var markup = `
           <input id="siglaQuerySubmit" type="submit" value="Search">
         </div>
       </div>
-      <div class="siglaResultSize">RISM: Hits 1-20 of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>
+      <div class="siglaResultSize">RISM: Hits <span id="firstPosition"></span>-<span id="lastPosition"></span> of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>
       <div class="siglaResultTables"></div>
+      <div id="siglaPager" class="siglaPager"></div>
 `
 //Adding listeners
 var addListeners = function(){
@@ -44,10 +50,17 @@ var addListeners = function(){
     }} );
 };
 
+var buildQueryString = function(obj){
+  term = obj.term;
+  startRecord = obj.offset;
+  queryString = `${sruhost}/sru/institutions?operation=searchRetrieve&version=1.1&query=${term}%20AND%20librarySiglum=*-*&maximumRecords=${limit}&startRecord=${startRecord}`;
+  return queryString;
+}
+
 //Make an ajax request to SRU, build html and push records to results
-var search = function(){
-   var queryTerm = document.querySelector("#siglaQueryInput").value;
-    var xhr = new XMLHttpRequest();
+var search = function(offset=1){
+  query.term = document.querySelector("#siglaQueryInput").value;
+  var xhr = new XMLHttpRequest();
 
     // Ajax reuest to SRU  
     xhr.onload = function () {
@@ -56,15 +69,18 @@ var search = function(){
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(xhr.response, "text/xml");
         var resultSize = xmlDoc.getElementsByTagNameNS(nsZing, "numberOfRecords")[0].innerHTML;
-        document.querySelector("#queryTerm").innerHTML = queryTerm;
+        document.querySelector("#queryTerm").innerHTML = query.term;
         document.querySelector("#resultSize").innerHTML = resultSize;
         document.querySelector(".siglaResultSize").style.display = 'block';
-        var marcRecords = xmlDoc.getElementsByTagNameNS(nsMarc, "record");
-        for (let i = 0; i < marcRecords.length; i++) {
-          var record = buildRecord(marcRecords[i]);
+        var zingRecords = xmlDoc.getElementsByTagNameNS(nsZing, "record");
+        for (let i = 0; i < zingRecords.length; i++) {
+          var record = buildRecord(zingRecords[i]);
           records.push(record);
         }
+        document.querySelector("#firstPosition").innerHTML = records[0].position;
+        document.querySelector("#lastPosition").innerHTML = records.slice(-1)[0].position;
         createElements(records);
+        buildPager(resultSize);
       }
       else {
         //FIXME show err at client
@@ -72,7 +88,11 @@ var search = function(){
       }
       //outer
     };
-    xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}%20AND%20librarySiglum=*-*&maximumRecords=20`);
+    query.offset = offset;
+    q = buildQueryString(query);
+    console.log(q);
+    xhr.open('GET', q);
+    //xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}%20AND%20librarySiglum=*-*&maximumRecords=20&startRecord=${startRecord}`);
     xhr.send();
 }
 
@@ -85,14 +105,14 @@ var createElements = function(collection){
   for (let i = 0; i < collection.length; i++) {
     record = collection[i];
     var div = 
-      `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${i+1}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
+      `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
         <div class="itemSigla">${record._110g}</div>
       </div>`
     var details = `
         <div id="details_${record.id}" class="itemDetails">
-          ${record._043c ? `<p><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></p>` : ""}
-          ${record._371a ? `<p><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></p>` : ""}
-          ${record._371u ? `<p><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></p>` : ""}
+          ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
+          ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
+          ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
       </div>`
     var element = new DOMParser().parseFromString(div, 'text/html');
     var details_element = new DOMParser().parseFromString(details, 'text/html');
@@ -104,7 +124,9 @@ var createElements = function(collection){
 //Function to build a record object from marcxml-record
 var buildRecord = function(xml) {
   var record = {};
-  var fields = xml.children;
+  record.position = xml.getElementsByTagNameNS(nsZing, "recordPosition")[0].innerHTML;
+  var marc = xml.getElementsByTagNameNS(nsMarc, "record")[0];
+  var fields = marc.children;
   for (let i = 0; i < fields.length; i++) {
     field = fields[i];
     if (field.getAttribute("tag") == "001") {
@@ -156,7 +178,6 @@ var buildRecord = function(xml) {
 // Toggle display of details
 var showDetails = function(id){
   var details = document.getElementById(`details_${id}`);
-  console.log(details.style.display);
   if (details.style.display === "none" || details.style.display === "") {
         details.style.display = "block";
   } else {
@@ -166,7 +187,21 @@ var showDetails = function(id){
 
 window.onload = function() {
   document.querySelector("#siglaCatalog").innerHTML = markup;
+  limit = parseInt(document.querySelector("#siglaCatalog").getAttribute("limit"));
+  sruhost = document.querySelector("#siglaCatalog").getAttribute("sruhost");
   addListeners();
+}
+
+var buildPager = function(resultSize){
+  size = parseInt(resultSize) + limit;
+  res = [];
+  for (let i = 1; i < size; i++) {
+    if (i % limit == 0) {
+      res.push(`<span class="pagerItem" onClick="search(${i - (limit - 1)})">${i / limit }</span>   `)
+    }  
+  }
+  document.getElementById(`siglaPager`).innerHTML = res.join("");
+
 }
 
 var countryCodes = {'XA-DE': 'Germany', 'XA-FR': 'France'}
