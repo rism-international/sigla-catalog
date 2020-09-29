@@ -1,8 +1,8 @@
 /**
-* Summary RISM sigla catalog.
-* Description This JS is building html nodes from a RISM-SRU request.to sigla.
+* RISM sigla catalog plugin.
+* This JS is building html nodes from a RISM-SRU request.to sigla.
 * @author: Stephan Hirsch
-* @version: 0.1
+* @version: 0.1 (september 2020)
 *
 */
 
@@ -11,20 +11,20 @@ const nsZing = "http://www.loc.gov/zing/srw/";
 var results = document.querySelector('.siglaResultTables');
 var records = [];
 var startRecord = 1;
-var query = {term: '*-*', offset: 1};
+var query = {term: '*-*', offset: 1, field: "any"};
 var sruhost = "";
-var limit = 10;
+var limit = 20;
 
 //Basic html template
 var markup = `
       <div class="siglaQuery">
         <div class="siglaQuerySelect">
           <select id="siglaQuerySelect" name="advanced">
-            <option value="">All fields</option>
-            <option value="name:">Name</option>
-            <option value="sigla:">Library Sigla</option>
-            <option value="city:">City</option>
-            <option value="country:">Country</option>             
+            <option value="any">All</option>
+            <option value="bath.corporateName">Name</option>
+            <option value="librarySiglum">Library Siglum</option>
+            <option value="city">City</option>
+            <option value="rism.country">Country</option>             
           </select>
         </div>
         <div class="siglaQueryInput">
@@ -53,13 +53,17 @@ var addListeners = function(){
 var buildQueryString = function(obj){
   term = obj.term;
   startRecord = obj.offset;
-  queryString = `${sruhost}/sru/institutions?operation=searchRetrieve&version=1.1&query=${term}%20AND%20librarySiglum=*-*&maximumRecords=${limit}&startRecord=${startRecord}`;
+  field = obj.field;
+  queryString = `${sruhost}/sru/institutions?operation=searchRetrieve&version=1.1&query=${field}=${term}%20AND%20librarySiglum=*-*&maximumRecords=${limit}&startRecord=${startRecord}`;
+  console.log(queryString);
   return queryString;
 }
 
 //Make an ajax request to SRU, build html and push records to results
 var search = function(offset=1){
   query.term = document.querySelector("#siglaQueryInput").value;
+  query.field = document.querySelector("#siglaQuerySelect").value;
+  console.log(query.field);
   var xhr = new XMLHttpRequest();
 
     // Ajax reuest to SRU  
@@ -90,7 +94,6 @@ var search = function(offset=1){
     };
     query.offset = offset;
     q = buildQueryString(query);
-    console.log(q);
     xhr.open('GET', q);
     //xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}%20AND%20librarySiglum=*-*&maximumRecords=20&startRecord=${startRecord}`);
     xhr.send();
