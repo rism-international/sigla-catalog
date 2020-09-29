@@ -23,8 +23,8 @@ var markup = `
             <option value="any">All</option>
             <option value="bath.corporateName">Name</option>
             <option value="librarySiglum">Library Siglum</option>
-            <option value="city">City</option>
-            <option value="rism.country">Country</option>             
+            <option value="rism.place">City</option>
+            <option value="rism.libraryCountry">Country</option>             
           </select>
         </div>
         <div class="siglaQueryInput">
@@ -63,6 +63,11 @@ var buildQueryString = function(obj){
 var search = function(offset=1){
   query.term = document.querySelector("#siglaQueryInput").value;
   query.field = document.querySelector("#siglaQuerySelect").value;
+  if (query.field == "rism.libraryCountry"){
+    country_iso = Object.entries(countryCodes).find(i => i[1] === query.term)[0];
+    query.term = country_iso;
+    //query.term = countryCode[query.term]
+  }
   console.log(query.field);
   var xhr = new XMLHttpRequest();
 
@@ -73,7 +78,8 @@ var search = function(offset=1){
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(xhr.response, "text/xml");
         var resultSize = xmlDoc.getElementsByTagNameNS(nsZing, "numberOfRecords")[0].innerHTML;
-        document.querySelector("#queryTerm").innerHTML = query.term;
+        var term = (query.field == 'rism.libraryCountry') ? countryCodes[query.term] : query.term
+        document.querySelector("#queryTerm").innerHTML = term;
         document.querySelector("#resultSize").innerHTML = resultSize;
         document.querySelector(".siglaResultSize").style.display = 'block';
         var zingRecords = xmlDoc.getElementsByTagNameNS(nsZing, "record");
@@ -208,7 +214,76 @@ var buildPager = function(resultSize){
 
 }
 
-var countryCodes = {'XA-DE': 'Germany', 'XA-FR': 'France'}
+var countryCodes = {
+  "XC-DZ":"Algeria",
+  "XD-AR":"Argentina",
+  "XB-AM":"Armenia",
+  "XE-AU":"Australia",
+  "XA-AT":"Austria",
+  "XA-BE":"Belgium",
+  "XC-BJ":"Benin",
+  "XD-BR":"Brazil",
+  "XA-BG":"Bulgaria",
+  "XB-KH":"Cambodia",
+  "XD-CA":"Canada",
+  "XD-CL":"Chile",
+  "XB-CN":"China",
+  "XD-CO":"Colombia",
+  "XA-HR":"Croatia",
+  "XD-CU":"Cuba",
+  "XA-CZ":"Czech",
+  "XA-DK":"Denmark",
+  "XC-EG":"Egypt",
+  "XA-EE":"Estonia",
+  "XA-FI":"Finland",
+  "XA-FR":"France",
+  "XA-DE":"Germany",
+  "XA-GR":"Greece",
+  "XD-GT":"Guatemala",
+  "XA-VA":"Holy See",
+  "XD-HN":"Honduras",
+  "XA-HU":"Hungary",
+  "XA-IS":"Iceland",
+  "XB-IN":"India",
+  "XB-IR":"Iran",
+  "XA-IE":"Ireland",
+  "XB-IL":"Israel",
+  "XA-IT":"Italy",
+  "XB-JP":"Japan",
+  "XB-KR":"Korea",
+  "XA-LV":"Latvia",
+  "XA-LT":"Lithuania",
+  "XA-LU":"Luxembourg",
+  "XA-MT":"Malta",
+  "XD-MX":"Mexico",
+  "XA-ME":"Montenegro",
+  "XA-NL":"Netherlands",
+  "XE-NZ":"New Zealand",
+  "XA-NO":"Norway",
+  "XD-PY":"Paraguay",
+  "XA-PL":"Poland",
+  "XA-PT":"Portugal",
+  "XD-PR":"Puerto Rico",
+  "XA-RO":"Romania",
+  "XA-RU":"Russia",
+  "XA-RS":"Serbia",
+  "XA-SK":"Slovakia",
+  "XA-SI":"Slovenia",
+  "XC-ZA":"South Africa",
+  "XA-ES":"Spain",
+  "XA-SE":"Sweden",
+  "XA-CH":"Switzerland",
+  "XB-SY":"Syria",
+  "XD-TT":"Trinidad and Tobago",
+  "XB-TR":"Turkey",
+  "XA-UA":"Ukraine",
+  "XA-GB":"United Kingdom",
+  "XD-US":"USA",
+  "XD-UY":"Uruguay",
+  "XD-VE":"Venezuela",
+  "XB-VN":"Viet Nam",
+  "XD-EC":"Ecuador",
+}
 
 
 
