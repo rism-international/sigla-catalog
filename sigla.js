@@ -63,11 +63,13 @@ var buildQueryString = function(obj){
 var search = function(offset=1){
   query.term = document.querySelector("#siglaQueryInput").value;
   query.field = document.querySelector("#siglaQuerySelect").value;
+  /*
   if (query.field == "rism.libraryCountry"){
     country_iso = Object.entries(countryCodes).find(i => i[1] === query.term)[0];
     query.term = country_iso;
     //query.term = countryCode[query.term]
   }
+  */
   console.log(query.field);
   var xhr = new XMLHttpRequest();
 
@@ -78,8 +80,8 @@ var search = function(offset=1){
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(xhr.response, "text/xml");
         var resultSize = xmlDoc.getElementsByTagNameNS(nsZing, "numberOfRecords")[0].innerHTML;
-        var term = (query.field == 'rism.libraryCountry') ? countryCodes[query.term] : query.term
-        document.querySelector("#queryTerm").innerHTML = term;
+        //var term = (query.field == 'rism.libraryCountry') ? countryCodes[query.term] : query.term
+        document.querySelector("#queryTerm").innerHTML = query.term;
         document.querySelector("#resultSize").innerHTML = resultSize;
         document.querySelector(".siglaResultSize").style.display = 'block';
         var zingRecords = xmlDoc.getElementsByTagNameNS(nsZing, "record");
@@ -115,11 +117,12 @@ var createElements = function(collection){
     record = collection[i];
     var div = 
       `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
-        <div class="itemSigla">${record._110g}</div>
+        <div class="itemSigla">(${record._110g})</div>
       </div>`
     var details = `
         <div id="details_${record.id}" class="itemDetails">
           <b>Information:</b>
+          ${record._410a ? `<div><span class="fieldName">Other names: </span><span class="fieldValue">${record._410a}</span></div>` : ""}
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
           ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
@@ -137,6 +140,7 @@ var buildRecord = function(xml) {
   record.position = xml.getElementsByTagNameNS(nsZing, "recordPosition")[0].innerHTML;
   var marc = xml.getElementsByTagNameNS(nsMarc, "record")[0];
   var fields = marc.children;
+  let _410ary = [];
   for (let i = 0; i < fields.length; i++) {
     field = fields[i];
     if (field.getAttribute("tag") == "001") {
@@ -181,7 +185,20 @@ var buildRecord = function(xml) {
         }
       }
     }
+
+    if (field.getAttribute("tag") == "410") {
+      subfields = field.children;
+      for (let i = 0; i < subfields.length; i++) {
+        subfield = subfields[i];
+        if (subfield.getAttribute("code") == "a") {
+          _410ary.push(subfield.innerHTML);
+        }
+      }
+    }
+    record._410a = _410ary.join("; ");
+ 
   }
+  console.log(record);
   return record;
 }
 
@@ -189,7 +206,7 @@ var buildRecord = function(xml) {
 var showDetails = function(id){
   var details = document.getElementById(`details_${id}`);
   if (details.style.display === "none" || details.style.display === "") {
-        details.style.display = "block";
+        details.style.display = "table-row";
   } else {
         details.style.display = "none";
   }
@@ -283,6 +300,7 @@ var countryCodes = {
   "XD-VE":"Venezuela",
   "XB-VN":"Viet Nam",
   "XD-EC":"Ecuador",
+
 }
 
 
