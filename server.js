@@ -8,13 +8,13 @@ var server = http.createServer(function (request, response) {
       var mimetype = dotoffset == -1
         ? 'text/plain'
         : {
-          '.html' : 'text/html',
-          '.ico' : 'image/x-icon',
-          '.jpg' : 'image/jpeg',
+          '.html' : 'text/html; charset=utf-8',
+          '.ico' : 'image/x-icon; charset=utf-8',
+          '.jpg' : 'image/jpeg; charset=utf-8',
           '.png' : 'image/png',
           '.gif' : 'image/gif',
           '.css' : 'text/css',
-          '.js' : 'text/javascript'
+          '.js' : 'text/javascript; charset=utf-8'
 
         }[ request.url.substr(dotoffset)  ];
       response.setHeader('Content-type' , mimetype);

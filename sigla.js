@@ -101,7 +101,7 @@ var search = function(offset=1){
     query.offset = offset;
     q = buildQueryString(query);
     xhr.open('GET', q);
-    //xhr.open('GET', `https://beta.rism.info/sru/institutions?operation=searchRetrieve&version=1.1&query=${queryTerm}%20AND%20librarySiglum=*-*&maximumRecords=20&startRecord=${startRecord}`);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=UTF-8"); 
     xhr.send();
 }
 
