@@ -34,7 +34,7 @@ var markup = `
           <input id="siglaQuerySubmit" type="submit" value="Search">
         </div>
       </div>
-      <div class="siglaResultSize">RISM: Hits <span id="firstPosition"></span>-<span id="lastPosition"></span> of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>
+      <div class="siglaResultSize"></div>
       <div class="siglaResultTables"></div>
       <div id="siglaPager" class="siglaPager"></div>
 `
@@ -80,7 +80,15 @@ var search = function(offset=1){
         parser = new DOMParser();
         xmlDoc = parser.parseFromString(xhr.response, "text/xml");
         var resultSize = xmlDoc.getElementsByTagNameNS(nsZing, "numberOfRecords")[0].innerHTML;
-        //var term = (query.field == 'rism.libraryCountry') ? countryCodes[query.term] : query.term
+        if (parseInt(resultSize) == 0) {
+          document.querySelector("#queryTerm").innerHTML = query.term;
+          document.querySelector(".siglaResultSize").innerHTML = `<div>No result for <span id="queryTerm" class="queryTerm">.</span>.`;
+          document.querySelector("#queryTerm").innerHTML = query.term;
+          document.querySelector('.siglaResultTables').innerHTML = "";
+          document.querySelector('.siglaPager').innerHTML = "";
+          return 0
+        }
+        document.querySelector(".siglaResultSize").innerHTML = `<div class="siglaResultSize">RISM: Hits <span id="firstPosition"></span>-<span id="lastPosition"></span> of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>`
         document.querySelector("#queryTerm").innerHTML = query.term;
         document.querySelector("#resultSize").innerHTML = resultSize;
         document.querySelector(".siglaResultSize").style.display = 'block';
