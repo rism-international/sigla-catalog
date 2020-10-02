@@ -116,7 +116,8 @@ var createElements = function(collection){
   for (let i = 0; i < collection.length; i++) {
     record = collection[i];
     var div = 
-      `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""} 
+      `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""}
+          ${record.sourceSize ? `<span class="sourceSize">★</span>` : ""}
         <div class="itemSigla">(${record._110g})</div>
       </div>`
     var details = `
@@ -126,6 +127,7 @@ var createElements = function(collection){
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
           ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
+          ${record.sourceSize ? `<a class="sourceButton" target="_blank" title="See musical sources in RISM Online Catalogue" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
       </div>`
     var element = new DOMParser().parseFromString(div, 'text/html');
     var details_element = new DOMParser().parseFromString(details, 'text/html');
@@ -195,8 +197,21 @@ var buildRecord = function(xml) {
         }
       }
     }
+    if (_410ary.length > 0) {
     record._410a = _410ary.join("; ");
+    }
  
+    if (field.getAttribute("tag") == "667") {
+      subfields = field.children;
+      for (let i = 0; i < subfields.length; i++) {
+        subfield = subfields[i];
+        if (subfield.getAttribute("code") == "a") {
+          record.sourceSize = parseInt(subfield.innerHTML.replace("Published sources: ", ""));
+        }
+      }
+    }
+
+
   }
   console.log(record);
   return record;
