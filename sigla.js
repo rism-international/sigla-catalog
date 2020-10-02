@@ -88,7 +88,7 @@ var search = function(offset=1){
           document.querySelector('.siglaPager').innerHTML = "";
           return 0
         }
-        document.querySelector(".siglaResultSize").innerHTML = `<div class="siglaResultSize">RISM: Hits <span id="firstPosition"></span>-<span id="lastPosition"></span> of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.</div>`
+        document.querySelector(".siglaResultSize").innerHTML = `RISM: Hits <span id="firstPosition"></span>-<span id="lastPosition"></span> of <span id="resultSize"></span> for <span id="queryTerm" class="queryTerm"></span>.`
         document.querySelector("#queryTerm").innerHTML = query.term;
         document.querySelector("#resultSize").innerHTML = resultSize;
         document.querySelector(".siglaResultSize").style.display = 'block';
