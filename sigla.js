@@ -126,6 +126,7 @@ var createElements = function(collection){
           ${record._410a ? `<div><span class="fieldName">Other names: </span><span class="fieldValue">${record._410a}</span></div>` : ""}
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
           ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
+          ${record._580x ? `<div><span class="fieldName">Now in: </span><span class="fieldValue">${record._580x}</span></div>` : ""}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
           ${record.sourceSize ? `<a class="sourceButton" target="_blank" title="See musical sources in RISM Online Catalogue" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
       </div>`
@@ -201,6 +202,17 @@ var buildRecord = function(xml) {
     record._410a = _410ary.join("; ");
     }
  
+    if (field.getAttribute("tag") == "580") {
+      subfields = field.children;
+      for (let i = 0; i < subfields.length; i++) {
+        subfield = subfields[i];
+        if (subfield.getAttribute("code") == "x") {
+          record._580x = subfield.innerHTML;
+        }
+      }
+    }
+
+
     if (field.getAttribute("tag") == "667") {
       subfields = field.children;
       for (let i = 0; i < subfields.length; i++) {
