@@ -28,7 +28,9 @@ var markup = `
           </select>
         </div>
         <div class="siglaQueryInput">
-          <input id="siglaQueryInput">
+          <input id="siglaQueryInput" type="text" list="autocomplete"  >
+          <datalist id="autocomplete">
+          </datalist>
         </div>
         <div class="siglaQuerySubmit">
           <input id="siglaQuerySubmit" type="submit" value="Search">
@@ -47,7 +49,14 @@ var addListeners = function(){
     if (e.keyCode === 13) {
       e.preventDefault();
       search();
-    }} );
+    }
+    if (e.srcElement.value.length > 1 ){
+      autocomplete(document.querySelector("#siglaQuerySelect").value, e.srcElement.value);
+    }
+    else {
+      document.querySelector('#autocomplete').innerHTML = "";
+    }
+  } );
 };
 
 var buildQueryString = function(obj){
@@ -55,7 +64,6 @@ var buildQueryString = function(obj){
   startRecord = obj.offset;
   field = obj.field;
   queryString = `${sruhost}/sru/institutions?operation=searchRetrieve&version=1.1&query=${field}=${term}%20AND%20librarySiglum=*-*&maximumRecords=${limit}&startRecord=${startRecord}`;
-  console.log(queryString);
   return queryString;
 }
 
@@ -63,14 +71,6 @@ var buildQueryString = function(obj){
 var search = function(offset=1){
   query.term = document.querySelector("#siglaQueryInput").value;
   query.field = document.querySelector("#siglaQuerySelect").value;
-  /*
-  if (query.field == "rism.libraryCountry"){
-    country_iso = Object.entries(countryCodes).find(i => i[1] === query.term)[0];
-    query.term = country_iso;
-    //query.term = countryCode[query.term]
-  }
-  */
-  console.log(query.field);
   var xhr = new XMLHttpRequest();
 
     // Ajax reuest to SRU  
@@ -132,7 +132,7 @@ var createElements = function(collection){
         <div id="details_${record.id}" class="itemDetails">
           <b>Information:</b>
           ${record._410a ? `<div><span class="fieldName">Other names: </span><span class="fieldValue">${record._410a}</span></div>` : ""}
-          ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
+          ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${record._043c}</span></div>` : ""}
           ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
           ${record._580x ? `<div><span class="fieldName">Now in: </span><span class="fieldValue">${record._580x}</span></div>` : ""}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
@@ -263,86 +263,27 @@ var buildPager = function(resultSize){
     }  
   }
   document.getElementById(`siglaPager`).innerHTML = res.join("");
-
 }
 
-var countryCodes = {
-  "XC-DZ":"Algeria",
-  "XD-AR":"Argentina",
-  "XB-AM":"Armenia",
-  "XE-AU":"Australia",
-  "XA-AT":"Austria",
-  "XA-BE":"Belgium",
-  "XC-BJ":"Benin",
-  "XD-BR":"Brazil",
-  "XA-BG":"Bulgaria",
-  "XB-KH":"Cambodia",
-  "XD-CA":"Canada",
-  "XD-CL":"Chile",
-  "XB-CN":"China",
-  "XD-CO":"Colombia",
-  "XA-HR":"Croatia",
-  "XD-CU":"Cuba",
-  "XA-CZ":"Czech",
-  "XA-DK":"Denmark",
-  "XC-EG":"Egypt",
-  "XA-EE":"Estonia",
-  "XA-FI":"Finland",
-  "XA-FR":"France",
-  "XA-DE":"Germany",
-  "XA-GR":"Greece",
-  "XD-GT":"Guatemala",
-  "XA-VA":"Holy See",
-  "XD-HN":"Honduras",
-  "XA-HU":"Hungary",
-  "XA-IS":"Iceland",
-  "XB-IN":"India",
-  "XB-IR":"Iran",
-  "XA-IE":"Ireland",
-  "XB-IL":"Israel",
-  "XA-IT":"Italy",
-  "XB-JP":"Japan",
-  "XB-KR":"Korea",
-  "XA-LV":"Latvia",
-  "XA-LT":"Lithuania",
-  "XA-LU":"Luxembourg",
-  "XA-MT":"Malta",
-  "XD-MX":"Mexico",
-  "XA-ME":"Montenegro",
-  "XA-NL":"Netherlands",
-  "XE-NZ":"New Zealand",
-  "XA-NO":"Norway",
-  "XD-PY":"Paraguay",
-  "XA-PL":"Poland",
-  "XA-PT":"Portugal",
-  "XD-PR":"Puerto Rico",
-  "XA-RO":"Romania",
-  "XA-RU":"Russia",
-  "XA-RS":"Serbia",
-  "XA-SK":"Slovakia",
-  "XA-SI":"Slovenia",
-  "XC-ZA":"South Africa",
-  "XA-ES":"Spain",
-  "XA-SE":"Sweden",
-  "XA-CH":"Switzerland",
-  "XB-SY":"Syria",
-  "XD-TT":"Trinidad and Tobago",
-  "XB-TR":"Turkey",
-  "XA-UA":"Ukraine",
-  "XA-GB":"United Kingdom",
-  "XD-US":"USA",
-  "XD-UY":"Uruguay",
-  "XD-VE":"Venezuela",
-  "XB-VN":"Viet Nam",
-  "XD-EC":"Ecuador",
+var autocomplete = function(selected, value) {
+  var datalist = document.querySelector('#autocomplete');
+  datalist.innerHTML = "";
+  switch (selected){
+    case "librarySiglum":
 
+
+
+      ary = countries;
+      break;
+    default:
+      ary = [];
+  }
+  for (let i = 1; i < ary.length; i++) {
+    if (ary[i].toLowerCase().startsWith(value.toLowerCase())){
+      datalist.innerHTML += `<option value="${ary[i]}">`
+    }
+  }
 }
 
-
-
-
-
-
-
-
+var countries = ["Algeria","Argentina","Armenia","Australia","Austria","Belgium","Benin","Brazil","Bulgaria","Cambodia","Canada","Chile","China","Colombia","Croatia","Cuba","Czech","Denmark","Egypt","Estonia","Finland","France","Germany","Greece","Guatemala","Holy See","Honduras","Hungary","Iceland","India","Iran","Ireland","Israel","Italy","Japan","Korea","Latvia","Lithuania","Luxembourg","Malta","Mexico","Montenegro","Netherlands","New Zealand","Norway","Paraguay","Poland","Portugal","Puerto Rico","Romania","Russia","Serbia","Slovakia","Slovenia","South Africa","Spain","Sweden","Switzerland","Syria","Trinidad and Tobago","Turkey","Ukraine","United Kingdom","USA","Uruguay","Venezuela","Viet Nam","Ecuador",]
 
