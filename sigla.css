@@ -1,6 +1,5 @@
 #siglaCatalog {
-  margin-top: 10%;
-  margin-left: 10%;
+  margin-top: 8%;
 }
 
 .siglaQuery {
@@ -38,11 +37,11 @@
   display: block;
   color: black;
   background-color: #efefef;
-  height: 32px;
+  //height: 32px;
   padding: 4px;
   font-size: 14px;
   text-decoration: none;
-  margin-top: 12px;
+  margin-top: 10px;
   font-weight: bold;
   cursor:pointer;
 }
