@@ -51,7 +51,7 @@ var addListeners = function(){
 };
 
 var buildQueryString = function(obj){
-  term = obj.term;
+  term = obj.term.replace(" ", "-");
   startRecord = obj.offset;
   field = obj.field;
   queryString = `${sruhost}/sru/institutions?operation=searchRetrieve&version=1.1&query=${field}=${term}%20AND%20librarySiglum=*-*&maximumRecords=${limit}&startRecord=${startRecord}`;
