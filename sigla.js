@@ -163,10 +163,13 @@ var buildRecord = function(xml) {
       for (let i = 0; i < subfields.length; i++) {
         subfield = subfields[i];
         if (subfield.getAttribute("code") == "c") {
-          record._043c = subfield.innerHTML;
+          if (countryCodes.hasOwnProperty(subfield.innerHTML)) {
+            record._043c = subfield.innerHTML;
+          }
         }
       }
     }
+
  
     if (field.getAttribute("tag") == "110") {
       subfields = field.children;
