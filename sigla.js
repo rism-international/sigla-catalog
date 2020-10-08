@@ -22,7 +22,7 @@ var markup = `
           <select id="siglaQuerySelect" name="advanced">
             <option value="any">All</option>
             <option value="bath.corporateName">Name</option>
-            <option value="librarySiglum">Library Siglum</option>
+            <option value="librarySiglum">Library siglum</option>
             <option value="rism.place">City</option>
             <option value="rism.libraryCountry">Country</option>             
           </select>
