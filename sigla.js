@@ -126,7 +126,7 @@ var createElements = function(collection){
     var div = 
       `<div id="${record.id}" onclick="showDetails(${record.id})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""}
           ${record.sourceSize ? `<span class="sourceSize">★</span>` : ""}
-        <div class="itemSigla">(${record._110g})</div>
+        <div class="itemSigla">${record._110g}</div>
       </div>`
     var details = `
         <div id="details_${record.id}" class="itemDetails">
