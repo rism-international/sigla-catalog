@@ -2,7 +2,7 @@
 * RISM sigla catalog plugin.
 * This JS is building html nodes from a RISM-SRU request.to sigla.
 * @author: Stephan Hirsch
-* @version: 0.2 (october 2020)
+* @version: 0.2.1 (october 2020)
 *
 */
 
@@ -131,20 +131,46 @@ var createElements = function(collection){
     var details = `
         <div id="details_${record._001}" class="itemDetails">
           <b>Information:</b>
-          ${record._410a ? `<div><span class="fieldName">Other names: </span><span class="fieldValue">${record._410a}</span></div>` : ""}
+          ${tagToDiv(record, '_410a', 'Other names')}
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
-          ${record._371a ? `<div><span class="fieldName">Address: </span><span class="fieldValue">${record._371a}</span></div>` : ""}
-          ${record._368a ? `<div><span class="fieldName">Type: </span><span class="fieldValue">${record._368a}</span></div>` : ""}
-          ${record._580x ? `<div><span class="fieldName">Now in: </span><span class="fieldValue">${record._580x}</span></div>` : ""}
-          ${record._680a ? `<div><span class="fieldName">Comment: </span><span class="fieldValue">${record._680a}</span></div>` : ""}
+          ${tagToDiv(record, '_371a', 'Adress')}
+          ${tagToDiv(record, '_368a', 'Type')}
+          ${tagToDiv(record, '_580x', 'Now in')}
+          ${tagToDiv(record, '_680a', 'Comment')}
+          ${tagToDiv(record, '_670a', 'References')}
+          ${tagToDiv(record, '_678a', 'History of institution')}
+          ${tagToDiv(record, '_700a', 'Person')}
+          ${tagToDiv(record, '_710a', 'Related institution')}
+          ${tagToDiv(record, '_024a', 'Authority Reference')}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
-          ${record.sourceSize ? `<a class="sourceButton" target="_blank" title="See musical sources in RISM Online Catalogue" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
+          ${record._667a ? `<a class="sourceButton" target="_blank" title="See musical sources in RISM Online Catalogue" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
       </div>`
     var element = new DOMParser().parseFromString(div, 'text/html');
     var details_element = new DOMParser().parseFromString(details, 'text/html');
     parent.append(element.body.firstElementChild);
     parent.append(details_element.body.firstElementChild);
    }
+}
+
+// Helper function to build div nodes from record 
+var tagToDiv = function(record, tag, name){
+  if (record.hasOwnProperty(tag)) {
+    if (tag === '_024a'){
+      var div = `<div><span class="fieldName">${name}: </span>`;
+      var res = [];
+      for (let i = 0; i < record._024a.length; i++) {
+        if (record._0242[i]==='DNB'){
+          res.push(`<span class="fieldValue">${record._0242[i]}: <a href="http://d-nb.info/gnd/${record._024a[i]}" target="_blank"> ${record._024a[i]}</a> </span>`);
+        } else {
+          res.push(`<span class="fieldValue">${record._0242[i]}: ${record._024a[i]}</span>`);
+        }
+      }
+      return `${div}${res.join("; ")}</div>`;
+  } else {
+    return `<div><span class="fieldName">${name}: </span><span class="fieldValue">${record[tag].join(";")}</span></div>`
+    }
+  }
+  return "";
 }
 
 //Function to build a record object from marcxml-record
@@ -163,10 +189,10 @@ var buildRecord = function(xml) {
         subfield = subfields[i];
         code = subfield.getAttribute("code");
         tag_with_code = `_${tag}${code}`;
-        if (record[tag_with_code]){
-          record[`_${tag}${code}`] += `; ${subfield.innerHTML}`;
+        if (record[tag_with_code]) {
+          record[tag_with_code].push(subfield.innerHTML);
         } else {
-          record[`_${tag}${code}`] = `${subfield.innerHTML}`;
+          record[tag_with_code] = [subfield.innerHTML];
         }
       }
     } else {
