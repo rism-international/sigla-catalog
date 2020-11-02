@@ -134,6 +134,7 @@ var createElements = function(collection){
           ${tagToDiv(record, '_410a', 'Other names')}
           ${record._043c ? `<div><span class="fieldName">Country: </span><span class="fieldValue">${countryCodes[record._043c]}</span></div>` : ""}
           ${tagToDiv(record, '_371a', 'Adress')}
+          ${tagToDiv(record, '_034f', 'Map')}
           ${tagToDiv(record, '_368a', 'Type')}
           ${tagToDiv(record, '_580x', 'Now in')}
           ${tagToDiv(record, '_680a', 'Comment')}
@@ -166,8 +167,44 @@ var tagToDiv = function(record, tag, name){
         }
       }
       return `${div}${res.join("; ")}</div>`;
-  } else {
-    return `<div><span class="fieldName">${name}: </span><span class="fieldValue">${record[tag].join(";")}</span></div>`
+      
+    } else if (tag === '_034f') {
+        var div = `<div><span class="fieldName">${name}: </span>`;
+        var res = [];
+        for (let i = 0; i < record._034f.length; i++) {
+          res.push(`<span class="fieldValue"><a href="http://www.openstreetmap.org/?mlat=${record._034f[i]}&mlon=${record._034d[i]}longitude&zoom=18" target="_blank">Show in OpenStreetMap</a> </span>`);
+        }
+        return `${div}${res.join("; ")}</div>`;
+    } else if (tag === '_580x') {
+        var div = `<div><span class="fieldName">${name}: </span>`;
+        var res = [];
+        for (let i = 0; i < record._580x.length; i++) {
+          res.push(`<span class="fieldValue"><a href="https://opac.rism.info/search?id=ks${record._5800[i]}&View=rism/" target="_blank"> ${record._580x[i]}</a> </span>`);
+        }
+        return `${div}${res.join("; ")}</div>`;
+    } else if (tag === '_670a') {
+        var div = `<div><span class="fieldName">${name}: </span>`;
+        var res = [];
+        for (let i = 0; i < record._670a.length; i++) {
+          res.push(`<span class="fieldValue"><a href="https://opac.rism.info/search?id=lit${record._6700[i]}&View=rism/" target="_blank"> ${record._670a[i]}</a> </span>`);
+        }
+        return `${div}${res.join("; ")}</div>`;
+    } else if (tag === '_700a') {
+        var div = `<div><span class="fieldName">${name}: </span>`;
+        var res = [];
+        for (let i = 0; i < record._700a.length; i++) {
+          res.push(`<span class="fieldValue"><a href="https://opac.rism.info/search?id=pe${record._7000[i]}&View=rism/" target="_blank"> ${record._700a[i]}</a> </span>`);
+        }
+        return `${div}${res.join("; ")}</div>`;
+    } else if (tag === '_710a') {
+        var div = `<div><span class="fieldName">${name}: </span>`;
+        var res = [];
+        for (let i = 0; i < record._710a.length; i++) {
+          res.push(`<span class="fieldValue"><a href="https://opac.rism.info/search?id=ks${record._7100[i]}&View=rism/" target="_blank"> ${record._710a[i]}</a> </span>`);
+        }
+        return `${div}${res.join("; ")}</div>`;
+    } else {
+      return `<div><span class="fieldName">${name}: </span><span class="fieldValue">${record[tag].join(";")}</span></div>`
     }
   }
   return "";
