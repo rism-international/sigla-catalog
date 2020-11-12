@@ -28,7 +28,7 @@ var markup = `
           </select>
         </div>
         <div class="siglaQueryInput">
-          <input id="siglaQueryInput">
+          <input type="search" id="siglaQueryInput">
         </div>
         <div class="siglaQuerySubmit">
           <input id="siglaQuerySubmit" type="submit" value="Search">
@@ -48,6 +48,15 @@ var addListeners = function(){
       e.preventDefault();
       search();
     }} );
+  document.getElementById("siglaQueryInput").addEventListener("search", 
+    function(){
+      if (this.value=="") 
+        {  document.querySelector('.siglaResultTables').innerHTML = "";
+           document.querySelector(".siglaResultSize").innerHTML = "";
+           document.querySelector('.siglaPager').innerHTML = "";
+          ;
+        }
+    });
 };
 
 var buildQueryString = function(obj){
