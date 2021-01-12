@@ -2,7 +2,7 @@
 * RISM sigla catalog plugin.
 * This JS is building html nodes from a RISM-SRU request.to sigla.
 * @author: Stephan Hirsch
-* @version: 0.2.1 (october 2020)
+* @version: 0.2.2 (december 2020)
 *
 */
 
@@ -142,7 +142,7 @@ var createElements = function(collection){
     record = collection[i];
     var div = 
       `<div id="${record._001}" onclick="showDetails(${record._001})" class="resultItem">${record.position}. ${record._110a}${record._110c ? ", " + record._110c : ""}
-          ${record._667a ? `<span title="This institution has sources in the RISM Online catalog" class="sourceSize">★</span>` : ""}
+          ${record._667a ? `<span title="This institution has sources in the RISM Catalog of Musical Sources" class="sourceSize">★</span>` : ""}
         <div class="itemSigla">${record._110g}</div>
       </div>`
     var details = `
@@ -161,7 +161,7 @@ var createElements = function(collection){
           ${tagToDiv(record, '_710a', 'Related institution')}
           ${tagToDiv(record, '_024a', 'Authority Reference')}
           ${record._371u ? `<div><span class="fieldName">URL: </span><span class="fieldValue"><a href="${record._371u}" target="_blank">${record._371u}</a></span></div>` : ""}
-          ${record._667a ? `<a class="sourceButton" target="_blank" title="See musical sources in RISM Online Catalogue" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
+          ${record._667a ? `<a class="sourceButton" target="_blank" title="See sources in RISM Catalog of Musical Sources" href="https://opac.rism.info/metaopac/search?View=rism&amp;siglum=${record._110g}">Sources</a>` : ""}
       </div>`
     var element = new DOMParser().parseFromString(div, 'text/html');
     var details_element = new DOMParser().parseFromString(details, 'text/html');
